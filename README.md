@@ -1,2 +1,2 @@
 # aws_powershell
-powershell meix with aws cli
+powershell mix with aws cli
