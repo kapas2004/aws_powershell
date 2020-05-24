@@ -1,7 +1,12 @@
+#invoke command .\tag_root_volume_aws.ps1 "aws region"
 #Add Tag Name to all Windows platform root volumes same as the Instance Name Tag plus (C) accross region
-
-$region = "eu-west-2"
-#Get all instances in one region
+[CmdLetBinding()]
+param (
+    #Set region to be searched
+    [string][Parameter(Position=0)]
+    $region = "eu-west-2"
+)
+#Get all instances in the region set
 $instances = (aws ec2 describe-instances --filter Name=platform,Values=windows --region $region --query "Reservations[].Instances[].InstanceId" --output text).split()
 
 $count = 1
@@ -29,3 +34,5 @@ foreach($instance in $instances) {
     }
     $count++
 }
+
+#MissingParameter
