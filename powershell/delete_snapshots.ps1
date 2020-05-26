@@ -1,21 +1,21 @@
 #
-#.\snapshotDelete.ps1 "region" ""owner-id "older than days" "confirm delete" "tagKey" tagValue" "*"_or_"InstanceId"
+#.\snapshotDelete.ps1 "region" "older than days" "confirm delete" "tagKey" tagValue" "*"_or_"InstanceId"
 #
 [CmdLetBinding()]
 param (
     [string][Parameter(Position=0)]
     $region = "eu-west-2",
-    [string][Parameter(Position=5)]
-    $ownerID = "xxxxxxxxxxxx",
-    [int][Parameter(Position=1)]
+    [string][Parameter(Position=1)]
+    $ownerID = "773932953659",
+    [int][Parameter(Position=2)]
     $startTime = -1,
-    [boolean][Parameter(Position=2)]
+    [boolean][Parameter(Position=3)]
     $delete = $true,
-    [string][Parameter(Position=3)]
-    $tagkey = "Description",
     [string][Parameter(Position=4)]
-    $tagvalue = "ALL Server",
+    $tagkey = "Description",
     [string][Parameter(Position=5)]
+    $tagvalue = "ALL Server",
+    [string][Parameter(Position=6)]
     $instancemanual = "*"
 )
 
@@ -132,6 +132,7 @@ foreach($instance in $instances) {
         }
     }
 }
-
-echo ""
+Remove-Item -Path .\err.txt
+echo "err.txt file removed."
 echo "Done."
+
