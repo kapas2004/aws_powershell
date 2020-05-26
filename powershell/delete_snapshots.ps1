@@ -3,29 +3,36 @@
 #
 [CmdLetBinding()]
 param (
+    #AWS region you want to work with, default is 'eu-west-2'
     [string][Parameter(Position=0)]
     $region = "eu-west-2",
+    #AWS account id to work with. You need this to get the snapshots only from this account
     [string][Parameter(Position=1)]
     $ownerID = "xxxxxxxxxxxx",
+    #How far to go from today, less or equal than 0
     [int][Parameter(Position=2)]
     $startTime = -1,
+    #Collect only or delete snapshots
     [boolean][Parameter(Position=3)]
     $delete = $true,
+    #Tag Key
     [string][Parameter(Position=4)]
     $tagkey = "Description",
+    #Tag Value
     [string][Parameter(Position=5)]
     $tagvalue = "ALL Server",
+    #All instances or only one
     [string][Parameter(Position=6)]
     $instancemanual = "*"
 )
 
-
+#Get the current date and add +/- days to the date from $startTime variable
 $getDate = (Get-Date (Get-Date).AddDays($startTime) -Format "yyyy-MM-dd")
+#Check if single instance or all to work with
 if ($instancemanual -eq "*"){
-	#Collect Volumes
+	#Collect all Instances
 	$instances = aws ec2 describe-instances --region eu-west-2 --query "Reservations[*].Instances[*].[InstanceId]" --output text
-	#$instances = aws ec2 describe-instances --region $region --filters "Name=instance-id, Values=$instancemanual" --query "Reservations[*].Instances[*].[InstanceId]" --output text
-	$fileName = "Deleted-$tagvalue"+"s AllSnapshots"
+	fileName = "Folder-$tagvalue"+"s Snapshots"
 }
 else {
 	#single instance
@@ -33,7 +40,7 @@ else {
 	$fileName = "Deleted-$tagvalue"+"s Snapshots "+$instancemanual
 }
 
-
+#Create a working wolder and add some prerequisites 
 try {
     New-Item -Path .\$fileName.csv -ItemType File -Force
     Add-Content -Path .\$fileName.csv -Value "Deleting Snapshots older than $getdate"
@@ -44,12 +51,15 @@ try {
 }
 catch
 {
+    #Exit dirty on error
     exit 1
 }
 
+#Count how many snapshots are in the region related to the owner-id
 $snapCount = ((aws ec2 describe-snapshots --owner-id $ownerID --region 'eu-west-2' --output json | ConvertFrom-Json).Snapshots.SnapshotId).Count
 echo "Number of snapshots in $region to be messed with up: $snapCount"
 
+#start working on collecting or removing the snapshots
 foreach($instance in $instances) {
     $instanceName = aws ec2 describe-instances --output text --filters "Name=instance-id, Values=$instance" --query 'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value | [0]]'
     $volumes = (aws ec2 describe-instances --instance-ids $instance --query Reservations[*].Instances[*].BlockDeviceMappings[*].Ebs.VolumeId --output text).Split("	")
@@ -101,6 +111,11 @@ foreach($instance in $instances) {
                                 Write-Host  (Get-Content -Path .\err.txt | Where-Object {$_ -match 'InvalidSnapshot.NotFound'})
                                 Add-Content -Path .\$fileName.csv -Value "$instanceName,$instance,$volume,$dateCreated,$snap, Not Found"
                             }
+                            elseif ((Get-Content -Path .\err.txt | Where-Object {$_ -match 'InvalidSnapshot.NotFound'}).Length -ne 0)
+                            {
+                                Write-Host  (Get-Content -Path .\err.txt | Where-Object {$_ -match 'InvalidParameterValue'})
+                                Add-Content -Path .\$fileName.csv -Value "$instanceName,$instance,$volume,$dateCreated,$snap, managed by the AWS Backup"
+                            }
                             else{
                                 echo "Snapshot for $instanceName, id: $instance, vol: $volume, created on: $dateCreated is deleted: $snap"
                                 Add-Content -Path .\$fileName.csv -Value "$instanceName,$instance,$volume,$dateCreated,$snap, $True"
@@ -127,7 +142,7 @@ foreach($instance in $instances) {
         }
         else{
             echo ""
-            echo " $instanceName, id: $instance, No Snapshot to be deleted."
+            echo " $instanceName, id: $instance, No Snapshot exists to be deleted."
             Add-Content -Path .\$fileName.csv -Value "$instanceName,$instance,$volume,$dateCreated,$snap, $False"
         }
     }
