@@ -6,7 +6,7 @@ param (
     [string][Parameter(Position=0)]
     $region = "eu-west-2",
     [string][Parameter(Position=1)]
-    $ownerID = "773932953659",
+    $ownerID = "xxxxxxxxxxxx",
     [int][Parameter(Position=2)]
     $startTime = -1,
     [boolean][Parameter(Position=3)]
