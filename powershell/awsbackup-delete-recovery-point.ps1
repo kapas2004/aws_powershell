@@ -1,17 +1,29 @@
 #
 # Delete AWS backup recovery point from specific Vault, filter by less than number of days
-# Usage
+# using mixed power shell and aws cli
+# 
+#Usage
 #.\aws-backup-delete-recovery-point-backup-vault-name.ps1 backupVault retentionDays
 #
 
-$backupVault = "VaultName"
-$retentionDays = 0
+param (
+    #AWS Region
+    [string][Parameter(Position=0)]
+    $region = "eu-west-2",
+    #Backup Vault Name
+    [string][Parameter(Position=1)]
+    $backupVault = "BackupVaultName",
+    #How much back in the past to go
+    [int][Parameter(Position=2)]
+    $retentionDays = -365
+)
+
 $date = Get-Date ((Get-Date).AddDays($retentionDays)) -Format "yyyy-MM-dd"
 $recoveryPointARN = `
     (`
     aws backup list-recovery-points-by-backup-vault `
         --backup-vault-name $backupVault `
-        --region "eu-west-2" `
+        --region $region `
         --query "RecoveryPoints[].RecoveryPointArn" `
         --by-created-before (Get-Date).AddDays($retentionDays) `
         --output text `
