@@ -31,14 +31,14 @@ $recoveryPointARN = `
 
 $beforeDate = $recoveryPointARN.Length
 
-echo "Total Backups= $beforeDate, before $date"
+Write-Ouput "Total Backups= $beforeDate, before $date"
 
 #looping through the 'RecoveryPointArn' and delete one by one
 foreach($recoveryPoint in $recoveryPointARN) {
     aws backup delete-recovery-point --backup-vault-name $backupVault --recovery-point-arn $recoveryPoint
-    echo "$beforeDate. $recoveryPoint Deleted"
+    Write-Ouput "$beforeDate. $recoveryPoint Deleted"
     $beforeDate--
 }
 
 
-echo "Total Backups left= $beforeDate, before $date"
+Write-Ouput "Total Backups left= $beforeDate, before $date"
