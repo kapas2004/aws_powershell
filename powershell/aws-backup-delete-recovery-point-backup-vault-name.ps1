@@ -4,7 +4,7 @@
 #.\aws-backup-delete-recovery-point-backup-vault-name.ps1 backupVault retentionDays
 #
 
-$backupVault = "PPDServer"
+$backupVault = "VaultName"
 $retentionDays = 0
 $date = Get-Date ((Get-Date).AddDays($retentionDays)) -Format "yyyy-MM-dd"
 $recoveryPointARN = `
