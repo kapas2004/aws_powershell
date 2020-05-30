@@ -1,6 +1,6 @@
 #
 # Delete AWS backup recovery point from specific Vault, filter by less than number of days
-# using mixed power shell and aws cli
+# using mixed powershell and aws cli
 # 
 #Usage
 #.\aws-backup-delete-recovery-point-backup-vault-name.ps1 backupVault retentionDays
