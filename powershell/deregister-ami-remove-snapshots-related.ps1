@@ -6,7 +6,7 @@
 # using mixed powershell and aws cli
 # 
 #Usage
-#.\deregister-ami-remov-snapshots-related.ps1
+#.\deregister-ami-remove-snapshots-related.ps1
 #
 # 
 
