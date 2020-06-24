@@ -1,4 +1,7 @@
 #
+# Created by kapas2004
+#
+#
 #.\snapshotDelete.ps1 "region" "older than days" "confirm delete" "tagKey" tagValue" "*"_or_"InstanceId"
 #
 [CmdLetBinding()]

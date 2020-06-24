@@ -1,4 +1,7 @@
 ﻿#
+# Created by kapas2004
+#
+#
 # List of manually added general instance types not running for cost optimization
 # using mixed powershell and aws cli
 # 
